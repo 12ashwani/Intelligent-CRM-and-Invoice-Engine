@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Create Invoice</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" id="invoiceForm" novalidate>
+
+                <!-- Customer Source -->
+                <h5 class="mb-4">Customer Source</h5>
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="crm_lead_id" class="form-label">Select CRM Lead</label>
+                            <select id="crm_lead_id" name="crm_lead_id" class="form-control">
+                                <option value="">-- Select CRM Lead --</option>
+                                {% for lead in crm_leads %}
+                                <option value="{{ lead.id }}"
+                                    data-company="{{ lead.company_name or '' }}"
+                                    data-email="{{ lead.auth_person_email or lead.email or '' }}"
+                                    data-contact="{{ lead.auth_person_number or '' }}"
+                                    data-service="{{ lead.service or '' }}"
+                                    data-status="{{ lead.status or '' }}"
+                                    {% if selected_lead and selected_lead.id == lead.id %}selected{% endif %}>
+                                    {{ lead.company_name or 'Unnamed Lead' }} - Lead #{{ lead.id }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Auto‑fills client details for the invoice.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customer_id" class="form-label">Or Select Existing Customer</label>
+                            <select id="customer_id" name="customer_id" class="form-control">
+                                <option value="">-- Select Existing Customer --</option>
+                                {% for c in customers %}
+                                <option value="{{ c.id }}"
+                                    data-name="{{ c.name or '' }}"
+                                    data-email="{{ c.email or '' }}"
+                                    data-gstin="{{ c.gstin or '' }}"
+                                    data-address="{{ c.address or '' }}"
+                                    data-contact="{{ c.contact or c.phone or '' }}"
+                                    data-state="{{ c.state or '' }}">
+                                    {{ c.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Details -->
+                <h5 class="mt-4 mb-4">Customer Details</h5>
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customer_name" class="form-label">Customer / Company Name <span class="text-danger">*</span></label>
+                            <input type="text" id="customer_name" name="customer_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customer_email" class="form-label">Email</label>
+                            <input type="email" id="customer_email" name="customer_email" class="form-control">
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customer_contact" class="form-label">Contact Number</label>
+                            <input type="text" id="customer_contact" name="customer_contact" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customer_state" class="form-label">State <span class="text-danger">*</span></label>
+                            <input type="text" id="customer_state" name="customer_state" class="form-control" placeholder="e.g., Maharashtra" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customer_gstin" class="form-label">GST Number</label>
+                            <input type="text" id="customer_gstin" name="customer_gstin" class="form-control" placeholder="15-digit GSTIN">
+                            <div class="invalid-feedback">GSTIN must be 15 characters (if provided).</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="crm_service" class="form-label">CRM Service (read‑only)</label>
+                            <input type="text" id="crm_service" class="form-control" readonly>
+                            <button type="button" id="addServiceAsItemBtn" class="btn btn-sm btn-outline-primary mt-1" style="display:none;">➕ Add service as item</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="customer_address" class="form-label">Address</label>
+                    <textarea id="customer_address" name="customer_address" class="form-control" rows="3" placeholder="Full billing address"></textarea>
+                </div>
+
+                <!-- Invoice Details -->
+                <h5 class="mt-5 mb-4">Invoice Details</h5>
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="invoice_type" class="form-label">Invoice Type</label>
+                            <select id="invoice_type" name="invoice_type" class="form-control" required>
+                                <option value="PI">Proforma Invoice</option>
+                                <option value="TAX">Tax Invoice</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="invoice_date" class="form-label">Invoice Date</label>
+                            <input type="date" id="invoice_date" name="invoice_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label">Due Date (optional)</label>
+                            <input type="date" id="due_date" name="due_date" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="po_number" class="form-label">PO Reference</label>
+                            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="Purchase Order Number">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="place_of_supply" class="form-label">Place of Supply</label>
+                            <input type="text" id="place_of_supply" name="place_of_supply" class="form-control" placeholder="e.g., Maharashtra (27)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="payment_terms" class="form-label">Payment Terms</label>
+                            <input type="text" id="payment_terms" name="payment_terms" class="form-control" placeholder="e.g., Net 30 days" value="Net 30 days">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="hsn_code" class="form-label">Default HSN/SAC Code</label>
+                            <input type="text" id="hsn_code" name="hsn_code" class="form-control" placeholder="e.g., 998314" value="998314">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <h5 class="mt-5 mb-4">Items</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="itemsTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Item Description</th>
+                                <th style="width:100px">Quantity</th>
+                                <th style="width:140px">Unit Price (₹)</th>
+                                <th style="width:120px">Total (₹)</th>
+                                <th style="width:50px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="items">
+                            <tr class="item-row">
+                                <td><input type="text" name="name[]" placeholder="Item name" class="form-control" required></td>
+                                <td><input type="number" name="qty[]" placeholder="Qty" class="form-control qty" min="1" value="1" required></td>
+                                <td><input type="number" name="price[]" placeholder="Price" class="form-control price" step="0.01" min="0" value="0" required></td>
+                                <td><span class="row-total">0.00</span></td>
+                                <td><button type="button" class="btn btn-sm btn-danger remove-item">✖</button></td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Subtotal</td>
+                                <td colspan="2"><span id="subtotal">0.00</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Tax (CGST+SGST / IGST)</td>
+                                <td colspan="2"><span id="taxAmount">0.00</span> <small id="taxTypeLabel"></small></td>
+                            </tr>
+                            <tr class="table-active">
+                                <td colspan="3" class="text-end fw-bold">Grand Total</td>
+                                <td colspan="2"><strong><span id="grandTotal">0.00</span></strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <button type="button" class="btn btn-secondary mb-4" id="addItemBtn">+ Add Another Item</button>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">Create Invoice</button>
+                    <a href="/invoices/ui" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Company state – must be passed from the backend (e.g., 'Maharashtra')
+    const COMPANY_STATE = "{{ company_state|default('Maharashtra') }}";
+
+    // Helper: format currency
+    function formatMoney(amount) {
+        return parseFloat(amount).toFixed(2);
+    }
+
+    // Clear all customer fields
+    function clearCustomerFields() {
+        document.getElementById("customer_name").value = "";
+        document.getElementById("customer_email").value = "";
+        document.getElementById("customer_contact").value = "";
+        document.getElementById("customer_gstin").value = "";
+        document.getElementById("customer_address").value = "";
+        document.getElementById("customer_state").value = "";
+        document.getElementById("crm_service").value = "";
+        document.getElementById("addServiceAsItemBtn").style.display = "none";
+    }
+
+    // Update totals for a single row
+    function updateRowTotal(row) {
+        const qty = parseFloat(row.querySelector('.qty')?.value) || 0;
+        const price = parseFloat(row.querySelector('.price')?.value) || 0;
+        const totalSpan = row.querySelector('.row-total');
+        const rowTotal = qty * price;
+        if (totalSpan) totalSpan.innerText = formatMoney(rowTotal);
+        return rowTotal;
+    }
+
+    // Recalculate all totals (subtotal, tax, grand total)
+    function calculateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('#items .item-row').forEach(row => {
+            subtotal += updateRowTotal(row);
+        });
+
+        const customerState = document.getElementById("customer_state").value.trim();
+        const isInterstate = (customerState && COMPANY_STATE && customerState !== COMPANY_STATE);
+        let taxRate = 0;
+        let taxType = "";
+
+        if (isInterstate) {
+            taxRate = 0.18;   // IGST 18%
+            taxType = "IGST 18%";
+        } else {
+            taxRate = 0.18;   // CGST 9% + SGST 9% = 18% total
+            taxType = "CGST 9% + SGST 9%";
+        }
+
+        const taxAmount = subtotal * taxRate;
+        const grandTotal = subtotal + taxAmount;
+
+        document.getElementById("subtotal").innerText = formatMoney(subtotal);
+        document.getElementById("taxAmount").innerText = formatMoney(taxAmount);
+        document.getElementById("taxTypeLabel").innerText = `(${taxType})`;
+        document.getElementById("grandTotal").innerText = formatMoney(grandTotal);
+    }
+
+    // Attach event listeners to all quantity and price inputs in the items table
+    function attachItemEvents() {
+        document.querySelectorAll('#items .item-row').forEach(row => {
+            const qtyInput = row.querySelector('.qty');
+            const priceInput = row.querySelector('.price');
+            if (qtyInput) {
+                qtyInput.removeEventListener('input', calculateTotals);
+                qtyInput.addEventListener('input', calculateTotals);
+            }
+            if (priceInput) {
+                priceInput.removeEventListener('input', calculateTotals);
+                priceInput.addEventListener('input', calculateTotals);
+            }
+        });
+    }
+
+    // Add a new empty item row
+    function addItemRow(description = "", qty = 1, price = 0) {
+        const tbody = document.getElementById("items");
+        const newRow = document.createElement("tr");
+        newRow.className = "item-row";
+        newRow.innerHTML = `
+            <td><input type="text" name="name[]" placeholder="Item name" class="form-control" value="${escapeHtml(description)}" required></td>
+            <td><input type="number" name="qty[]" placeholder="Qty" class="form-control qty" min="1" value="${qty}" required></td>
+            <td><input type="number" name="price[]" placeholder="Price" class="form-control price" step="0.01" min="0" value="${price}" required></td>
+            <td><span class="row-total">${formatMoney(qty * price)}</span></td>
+            <td><button type="button" class="btn btn-sm btn-danger remove-item">✖</button></td>
+        `;
+        tbody.appendChild(newRow);
+        attachItemEvents();
+        calculateTotals();
+    }
+
+    // Simple escape to prevent XSS
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Update form fields from selected CRM lead
+    function updateLeadDetails() {
+        const select = document.getElementById("crm_lead_id");
+        const selectedOption = select.options[select.selectedIndex];
+
+        // Clear customer selection dropdown
+        document.getElementById("customer_id").value = "";
+        // Clear all customer fields
+        clearCustomerFields();
+
+        if (!selectedOption || !selectedOption.value) return;
+
+        document.getElementById("customer_name").value = selectedOption.dataset.company || "";
+        document.getElementById("customer_email").value = selectedOption.dataset.email || "";
+        document.getElementById("customer_contact").value = selectedOption.dataset.contact || "";
+        const service = selectedOption.dataset.service || "";
+        document.getElementById("crm_service").value = service;
+
+        // Show "add service as item" button if service text exists
+        const addBtn = document.getElementById("addServiceAsItemBtn");
+        if (service.trim() !== "") {
+            addBtn.style.display = "inline-block";
+            addBtn.onclick = () => {
+                addItemRow(service, 1, 0);
+                calculateTotals();
+            };
+        } else {
+            addBtn.style.display = "none";
+        }
+        calculateTotals(); // recalc tax when state might be empty
+    }
+
+    // Update form fields from selected existing customer
+    function updateCustomerDetails() {
+        const select = document.getElementById("customer_id");
+        const selectedOption = select.options[select.selectedIndex];
+
+        // Clear CRM lead selection
+        document.getElementById("crm_lead_id").value = "";
+        document.getElementById("crm_service").value = "";
+        document.getElementById("addServiceAsItemBtn").style.display = "none";
+
+        if (!selectedOption || !selectedOption.value) {
+            clearCustomerFields();
+            calculateTotals();
+            return;
+        }
+
+        document.getElementById("customer_name").value = selectedOption.dataset.name || "";
+        document.getElementById("customer_email").value = selectedOption.dataset.email || "";
+        document.getElementById("customer_contact").value = selectedOption.dataset.contact || "";
+        document.getElementById("customer_gstin").value = selectedOption.dataset.gstin || "";
+        document.getElementById("customer_address").value = selectedOption.dataset.address || "";
+        document.getElementById("customer_state").value = selectedOption.dataset.state || "";
+        calculateTotals();
+    }
+
+    // GSTIN validation (basic)
+    function validateGSTIN(gstin) {
+        if (!gstin) return true;
+        return /^[0-9A-Z]{15}$/.test(gstin);
+    }
+
+    // Form submit validation
+    function validateForm(event) {
+        let isValid = true;
+        const name = document.getElementById("customer_name");
+        const state = document.getElementById("customer_state");
+        const email = document.getElementById("customer_email");
+        const gstin = document.getElementById("customer_gstin");
+
+        if (!name.value.trim()) {
+            name.classList.add("is-invalid");
+            isValid = false;
+        } else {
+            name.classList.remove("is-invalid");
+        }
+
+        if (!state.value.trim()) {
+            state.classList.add("is-invalid");
+            isValid = false;
+        } else {
+            state.classList.remove("is-invalid");
+        }
+
+        if (email.value && !/^\S+@\S+\.\S+$/.test(email.value)) {
+            email.classList.add("is-invalid");
+            isValid = false;
+        } else {
+            email.classList.remove("is-invalid");
+        }
+
+        if (gstin.value && !validateGSTIN(gstin.value)) {
+            gstin.classList.add("is-invalid");
+            isValid = false;
+        } else {
+            gstin.classList.remove("is-invalid");
+        }
+
+        // Check at least one item row has name, qty>0, price>=0
+        let hasValidItem = false;
+        document.querySelectorAll('#items .item-row').forEach(row => {
+            const itemName = row.querySelector('input[name="name[]"]')?.value.trim();
+            const qty = parseFloat(row.querySelector('.qty')?.value);
+            const price = parseFloat(row.querySelector('.price')?.value);
+            if (itemName && qty > 0 && price >= 0) hasValidItem = true;
+        });
+        if (!hasValidItem) {
+            alert("Please add at least one valid item with name, positive quantity, and non‑negative price.");
+            isValid = false;
+        }
+
+        if (!isValid) event.preventDefault();
+        return isValid;
+    }
+
+    // Set default invoice date to today
+    function setDefaultDate() {
+        const today = new Date().toISOString().split('T')[0];
+        const invoiceDateField = document.getElementById("invoice_date");
+        if (!invoiceDateField.value) invoiceDateField.value = today;
+    }
+
+    // Event delegation for remove buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-item')) {
+            const row = e.target.closest('.item-row');
+            if (row && document.querySelectorAll('#items .item-row').length > 1) {
+                row.remove();
+                calculateTotals();
+            } else {
+                alert("You must keep at least one item row.");
+            }
+        }
+    });
+
+    // Initialisation
+    document.addEventListener("DOMContentLoaded", function() {
+        attachItemEvents();
+        calculateTotals();
+        setDefaultDate();
+
+        const leadSelect = document.getElementById("crm_lead_id");
+        const customerSelect = document.getElementById("customer_id");
+
+        leadSelect.addEventListener("change", updateLeadDetails);
+        customerSelect.addEventListener("change", updateCustomerDetails);
+
+        document.getElementById("addItemBtn").addEventListener("click", () => addItemRow("", 1, 0));
+        document.getElementById("customer_state").addEventListener("input", calculateTotals);
+        document.getElementById("invoiceForm").addEventListener("submit", validateForm);
+
+        // If a lead was pre-selected (e.g., from previous page), trigger update
+        if (leadSelect.value) updateLeadDetails();
+        else if (customerSelect.value) updateCustomerDetails();
+    });
+</script>
+
+{% endblock %}

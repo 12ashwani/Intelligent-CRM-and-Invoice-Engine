@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Invoices</h2>
+            {% if company and company.name %}
+            <p class="text-muted"><strong>{{ company.name }}</strong></p>
+            {% endif %}
+        </div>
+        <div class="col text-end">
+            <a href="/invoices/create-ui" class="btn btn-primary btn-lg">+ Create New Invoice</a>
+        </div>
+    </div>
+
+    {% if invoices %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Invoice #</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv in invoices %}
+                        <tr>
+                            <td><small>{{ inv.id }}</small></td>
+                            <td><strong>{{ inv.invoice_number }}</strong></td>
+                            <td>
+                                {% if inv.invoice_type == 'PI' %}
+                                    <span class="badge bg-info">Proforma</span>
+                                {% else %}
+                                    <span class="badge bg-success">Tax Invoice</span>
+                                {% endif %}
+                            </td>
+                            <td>Rs {{ "%.2f"|format(inv.total if inv.total else inv.subtotal) }}</td>
+                            <td>
+                                {% set status = (inv.status if inv.status else 'draft')|string|lower %}
+                                {% if status == 'paid' %}
+                                    <span class="badge bg-success">{{ status|title }}</span>
+                                {% elif status in ['pending', 'partial'] %}
+                                    <span class="badge bg-warning">{{ status|title }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/invoices/{{ inv.id }}/view" class="btn btn-sm btn-primary" title="View Invoice">👁 View</a>
+                                <a href="/invoices/{{ inv.id }}/pdf" class="btn btn-sm btn-success" title="Download PDF">PDF</a>
+                                <a href="/payments/pay/{{ inv.id }}" class="btn btn-sm btn-warning" title="Record Payment">Pay</a>
+                                <form method="post" action="/invoices/{{ inv.id }}/delete" onsubmit="return confirm('Are you sure you want to delete this invoice?')" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Delete Invoice">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <p>No invoices found. <a href="/invoices/create-ui" class="alert-link">Create your first invoice</a></p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

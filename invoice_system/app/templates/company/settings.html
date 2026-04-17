@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Company Settings</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+
+                <h5 class="mt-4">Company Information</h5>
+                <hr>
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Company Name</label>
+                    <input type="text" id="name" name="name" placeholder="Company Name" class="form-control"
+                           value="{{ company[1] if company else '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="gstin" class="form-label">GSTIN</label>
+                    <input type="text" id="gstin" name="gstin" placeholder="GSTIN" class="form-control"
+                           value="{{ company[2] if company else '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea id="address" name="address" placeholder="Address" class="form-control" rows="3" required>{{ company[3] if company else '' }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="logo" class="form-label">Upload Logo</label>
+                    <input type="file" id="logo" name="logo" class="form-control" accept="image/*">
+                    {% if company and company[4] %}
+                        <div class="mt-2">
+                            <small class="text-muted">Current Logo:</small>
+                            <img src="/static/uploads/{{ company[4] }}" width="120" class="img-thumbnail mt-2">
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h5 class="mt-5">Bank Account Details</h5>
+                <hr>
+
+                <div class="mb-3">
+                    <label for="bank_name" class="form-label">Bank Name</label>
+                    <input type="text" id="bank_name" name="bank_name" placeholder="e.g., State Bank of India" class="form-control"
+                           value="{{ company[8] if company and company|length > 8 else '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="bank_account" class="form-label">Account Number</label>
+                    <input type="text" id="bank_account" name="bank_account" placeholder="Bank Account Number" class="form-control"
+                           value="{{ company[9] if company and company|length > 9 else '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="ifsc_code" class="form-label">IFSC Code</label>
+                    <input type="text" id="ifsc_code" name="ifsc_code" placeholder="e.g., SBIN0001234" class="form-control"
+                           value="{{ company[10] if company and company|length > 10 else '' }}">
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Save Settings</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

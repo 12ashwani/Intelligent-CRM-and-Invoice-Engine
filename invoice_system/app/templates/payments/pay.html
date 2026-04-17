@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h3>Pay Invoice</h3>
+        </div>
+        <div class="col text-end">
+            <a href="/invoices/ui" class="btn btn-secondary">Back to Invoices</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Invoice Number:</strong> {{ invoice[1] }}</p>
+                    <p><strong>Total:</strong> <span class="badge bg-primary">Rs {{ invoice[9] }}</span></p>
+                </div>
+                <div class="col-md-6 text-end">
+                    {% set raw_status = invoice[10] if invoice|length > 10 and invoice[10] else 'draft' %}
+                    {% set status = raw_status|string|lower %}
+                    <p><strong>Status:</strong>
+                        {% if status == 'paid' %}
+                            <span class="badge bg-success">{{ status|title }}</span>
+                        {% elif status in ['pending', 'partial'] %}
+                            <span class="badge bg-warning">{{ status|title }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ status|title }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Add Payment</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Payment Amount (Rs)</label>
+                    <input type="number" step="0.01" id="amount" name="amount" class="form-control" placeholder="Enter amount" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg">Process Payment</button>
+            </form>
+        </div>
+    </div>
+
+    {% if payments %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Payment History</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td><strong>Rs {{ p[2] }}</strong></td>
+                        <td>
+                            {% set payment_status = (p[3] or 'pending')|string|lower %}
+                            {% if payment_status in ['completed', 'paid'] %}
+                                <span class="badge bg-success">{{ payment_status|title }}</span>
+                            {% else %}
+                                <span class="badge bg-warning">{{ payment_status|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ p[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

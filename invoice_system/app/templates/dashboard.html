@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card p-3 bg-primary text-white">
+            <h5>Total Revenue</h5>
+            <h3>{{ data.stats.total_revenue }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 bg-success text-white">
+            <h5>Invoices</h5>
+            <h3>{{ data.stats.total_invoices }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 bg-info text-white">
+            <h5>Paid</h5>
+            <h3>{{ data.stats.paid }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 bg-danger text-white">
+            <h5>Pending</h5>
+            <h3>{{ data.stats.pending }}</h3>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<canvas id="salesChart"></canvas>
+<br>
+<canvas id="typeChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Monthly Sales Chart
+const monthlyData = {{ data.monthly | tojson }};
+const labels = monthlyData.map(x => "Month " + x[0]);
+const values = monthlyData.map(x => x[1]);
+
+new Chart(document.getElementById('salesChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Monthly Revenue',
+            data: values
+        }]
+    }
+});
+
+// Invoice Type Chart
+const typeData = {{ data.types | tojson }};
+const typeLabels = typeData.map(x => x[0]);
+const typeValues = typeData.map(x => x[1]);
+
+new Chart(document.getElementById('typeChart'), {
+    type: 'pie',
+    data: {
+        labels: typeLabels,
+        datasets: [{
+            data: typeValues
+        }]
+    }
+});
+</script>
+
+{% endblock %}
