@@ -1,5 +1,8 @@
-from db.mysql import get_connection
+from ai_agent.db.mysql import get_connection
 
-conn = get_connection()
-print("Connected")
-conn.close()
+try:
+    conn = get_connection()
+    print("✅ Database connected successfully")
+    conn.close()
+except Exception as e:
+    print("❌ DB Error:", e)
