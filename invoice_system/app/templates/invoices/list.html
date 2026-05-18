@@ -101,7 +101,7 @@
                     </thead>
                     <tbody>
                         {% for inv in invoices %}
-                        <tr data-invoice-id="{{ inv.id }}" data-type="{{ inv.invoice_type }}" data-status="{{ inv.status|lower }}">
+                        <tr data-invoice-id="{{ inv.id }}" data-type="{{ (inv.invoice_type or '')|upper }}" data-status="{{ inv.status|lower }}">
                             <td class="ps-4"><small class="text-muted">{{ inv.id }}</small></td>
                             <td>
                                 <strong class="text-primary">{{ inv.invoice_number }}</strong>
@@ -113,11 +113,12 @@
                                 </div>
                             </td>
                             <td>
-                                {% if inv.invoice_type == 'PI' %}
+                                {% set inv_type = (inv.invoice_type or '')|upper %}
+                                {% if inv_type == 'PI' %}
                                     <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
                                         <i class="fas fa-file-alt me-1"></i> Proforma
                                     </span>
-                                {% elif inv.invoice_type == 'tax' %}
+                                {% elif inv_type == 'TAX' %}
                                     <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
                                         <i class="fas fa-file-invoice-dollar me-1"></i> Tax Invoice
                                     </span>
@@ -306,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
         allRows.forEach(row => {
             const invoiceNumber = (row.cells[1]?.innerText || '').toLowerCase();
             const customerName = (row.cells[2]?.innerText || '').toLowerCase();
-            const invoiceType = row.getAttribute('data-type') || '';
+            const invoiceType = (row.getAttribute('data-type') || '').toUpperCase();
             const invoiceStatus = row.getAttribute('data-status') || '';
             
             let matchesSearch = true;
@@ -316,7 +317,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let matchesType = true;
             if (typeValue !== 'all') {
-                matchesType = invoiceType === typeValue;
+                if (typeValue === 'PI') {
+                    matchesType = invoiceType === 'PI';
+                } else if (typeValue === 'tax') {
+                    matchesType = invoiceType === 'TAX';
+                } else if (typeValue === 'regular') {
+                    matchesType = invoiceType !== 'PI' && invoiceType !== 'TAX';
+                }
             }
             
             let matchesStatus = true;

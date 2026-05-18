@@ -93,9 +93,9 @@ def index():
 DEPARTMENT_DASHBOARD_ENDPOINTS = {
     "admin": "admin.admin_dashboard",
     "hr": "hr.dashboard",
-    "marketing": "employee.dashboard",
-    "operations": "employee.dashboard",
-    "accounts": "employee.dashboard",
+    "marketing": "marketing.dashboard",
+    "operations": "operations.dashboard",
+    "accounts": "accounts.payments",
     "employee": "employee.dashboard",
 }
 

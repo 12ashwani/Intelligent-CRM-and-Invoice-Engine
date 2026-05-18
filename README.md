@@ -1,167 +1,215 @@
-# Intelligent CRM with Invoice Engine
+# Intelligent CRM and Invoice Engine
 
-Intelligent CRM with Invoice Engine is a Python-based business workflow project that combines:
+An integrated business automation platform that combines:
 
-- a CRM data source for leads and payments
-- an invoice management web app built with Flask
-- a local AI assistant that can query CRM data in natural language
+- Customer Relationship Management (CRM)
+- AI-powered business assistant
+- Invoice and billing management
+- Payment tracking
+- PDF invoice generation
+- Business workflow automation
 
-The goal of the project is to help teams manage customers, generate invoices, track payments, and access CRM insights through a simple AI-driven interface.
+This project is designed to help businesses manage leads, customers, invoices, payments, and business operations from a unified system powered by Flask, MySQL, and AI-assisted workflows.
 
-## Project Modules
+---
 
-### 1. Invoice System
-The `invoice_system/` module is a Flask application for:
+# Project Overview
 
-- company profile and logo setup
-- customer management
-- tax invoice and proforma invoice creation
-- GST-based tax calculation
-- payment recording
-- invoice PDF generation
+The system contains three major modules:
 
-By default, it runs on `http://127.0.0.1:5001`.
+| Module | Description |
+|---|---|
+| CRM System | Manage leads, customers, follow-ups, and payments |
+| Invoice Engine | Generate GST invoices, proforma invoices, and payment records |
+| AI Assistant | Query CRM and invoice data using natural language |
 
-### 2. AI Agent
-The `ai_agent/` module is a local CLI assistant that can:
+---
 
-- show today's leads
-- search leads by company
-- show lead status reports
-- list pending payments
-- show payment history
-- return document requirements for supported services
+# Features
 
-The AI agent currently works through rule-based intent routing plus CRM/MySQL queries.
+## CRM Features
 
-### 3. CRM Integration
-The project expects CRM data from a MySQL database such as:
+- Lead management
+- Customer management
+- Follow-up tracking
+- Payment tracking
+- Lead status monitoring
+- Dashboard analytics
+- Search and filter leads
+- CRM-integrated invoice generation
 
-- `leads`
-- `payments`
+---
 
-The invoice system also reads CRM leads while creating invoices.
+## Invoice Engine Features
 
-## Current Repository State
+- Tax Invoice generation
+- Proforma Invoice generation
+- GST calculations
+- CGST / SGST / IGST support
+- Company profile setup
+- Company logo upload
+- Bank details configuration
+- PDF invoice export
+- Invoice payment tracking
+- Invoice history management
 
-The root launcher `run.py` expects a CRM app at `crm-flask/app.py`, but the `crm-flask/` folder is empty in this repository snapshot. That means:
+---
 
-- the invoice system can still be documented and developed
-- the AI agent code exists
-- full end-to-end startup through `run.py` will not work until the CRM Flask app is added back
+## AI Assistant Features
 
-## Tech Stack
+The AI assistant supports natural language queries such as:
+
+- Show today's leads
+- List pending payments
+- Search company details
+- Payment history lookup
+- Lead status reports
+- GST registration document requirements
+- CRM business insights
+
+The AI module currently supports:
+
+- Rule-based intent routing
+- CRM database querying
+- Voice-ready architecture
+- Ollama integration
+- Whisper speech processing
+- pyttsx3 text-to-speech
+
+---
+
+# Tech Stack
+
+## Backend
 
 - Python
 - Flask
 - MySQL
-- `flask-mysqldb`
-- `mysql-connector-python`
-- WeasyPrint / fallback PDF generation
-- Whisper
-- `pyttsx3`
-- Ollama
+- SQLAlchemy
+- flask-mysqldb
+- mysql-connector-python
 
-## Folder Structure
+---
+
+## AI & Automation
+
+- Ollama
+- Whisper
+- pyttsx3
+
+---
+
+## PDF & Reporting
+
+- WeasyPrint
+- HTML/CSS invoice templates
+
+---
+
+# Project Structure
 
 ```text
-.
-|-- ai_agent/
-|   |-- agent/
-|   |-- db/
-|   |-- input/
-|   |-- llm/
-|   |-- tools/
-|   |-- voice/
-|   |-- main.py
-|   `-- run_agent.py
-|-- crm-flask/
-|-- invoice_system/
-|   |-- app/
-|   |   |-- controllers/
-|   |   |-- models/
-|   |   |-- repositories/
-|   |   |-- services/
-|   |   |-- templates/
-|   |   `-- utils/
-|   |-- migrate.py
-|   `-- run.py
-|-- create_ai_agent.py
-|-- requirements.txt
-`-- run.py
+Intelligent-CRM-and-Invoice-Engine/
+│
+├── ai_agent/
+│   ├── agent/
+│   ├── config/
+│   ├── db/
+│   ├── input/
+│   ├── llm/
+│   ├── tools/
+│   ├── voice/
+│   ├── main.py
+│   ├── run_agent.py
+│   └── test_db.py
+│
+├── crm/
+│   ├── app.py
+│   ├── routes/
+│   ├── templates/
+│   ├── static/
+│   ├── models/
+│   ├── controllers/
+│   ├── services/
+│   └── utils/
+│
+├── comman_db/
+│
+├── invoice_system/
+│   ├── app/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── repositories/
+│   │   ├── services/
+│   │   ├── templates/
+│   │   └── utils/
+│   │
+│   ├── migrate.py
+│   ├── run.py
+│   └── requirements.txt
+│
+├── shared_sso/
+├── requirements.txt
+├── run.py
+├── LICENSE
+└── README.md
 ```
 
-## Features
+---
 
-- Create and manage customers
-- Configure company details, bank details, and logo
-- Generate proforma and tax invoices
-- Calculate CGST, SGST, and IGST
-- Download invoices as PDF
-- Track invoice payments
-- Pull CRM leads into invoice creation flow
-- Ask the AI assistant for CRM summaries and service document requirements
+# Installation
 
-## Installation
-
-### 1. Clone the project
+## 1. Clone Repository
 
 ```bash
-git clone <your-repository-url>
-cd Intelligent-CRM-with-Invoice-Engine
+git clone https://github.com/12ashwani/Intelligent-CRM-and-Invoice-Engine.git
+cd Intelligent-CRM-and-Invoice-Engine
 ```
 
-### 2. Create a virtual environment
+Repository:
+https://github.com/12ashwani/Intelligent-CRM-and-Invoice-Engine
+
+---
+
+## 2. Create Virtual Environment
+
+### Windows
 
 ```bash
-python -m venv .venv
+python -m venv crmenv
+crmenv\Scripts\activate
 ```
 
-Windows:
+### Linux / macOS
 
 ```bash
-.venv\Scripts\activate
+python3 -m venv crmenv
+source crmenv/bin/activate
 ```
 
-macOS/Linux:
+---
 
-```bash
-source .venv/bin/activate
-```
+## 3. Install Dependencies
 
-### 3. Install dependencies
-
-Install the root dependencies:
+Install all required packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Install the invoice-system-specific dependencies too:
+Optional invoice-system-specific dependencies:
 
 ```bash
 pip install -r invoice_system/requirements.txt
 ```
 
-## Environment Variables
+---
 
-Create a `.env` file for the invoice system if you want to override defaults:
+# Environment Variables
 
-```env
-SECRET_KEY=change-me
-MYSQL_HOST=localhost
-MYSQL_USER=root
-MYSQL_PASSWORD=your_password
-MYSQL_DB=invoice_db
-APP_HOST=127.0.0.1
-APP_PORT=5001
-CRM_URL=http://localhost:5000
-INVOICE_ACCESS_SECRET=change-this-secret
-INVOICE_ACCESS_TTL_SECONDS=3600
-INVOICE_DEV_MODE=true
-```
+Create a `.env` file in the root directory.
 
-For the AI agent, these environment variables are used for CRM database access:
+## CRM Database
 
 ```env
 CRM_DB_HOST=localhost
@@ -170,39 +218,97 @@ CRM_DB_PASSWORD=your_password
 CRM_DB_NAME=crm_db
 ```
 
-Important: this repository currently contains hard-coded development credentials in some AI agent files. Replace them with environment variables before using the project outside local development.
+---
 
-## Database Notes
+## Invoice System
 
-You will need MySQL databases/tables for:
+```env
+SECRET_KEY=change-me
 
-- invoice system data such as customers, invoices, invoice items, company settings, and invoice payments
-- CRM data such as leads and payments
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=your_password
+MYSQL_DB=crm_db
 
-The invoice module includes a migration helper:
+APP_HOST=127.0.0.1
+APP_PORT=5001
+
+CRM_URL=http://localhost:5000
+
+INVOICE_ACCESS_SECRET=change-this-secret
+INVOICE_ACCESS_TTL_SECONDS=3600
+INVOICE_DEV_MODE=true
+```
+
+---
+
+# Database Setup
+
+You need MySQL databases for:
+
+## CRM Database
+
+Tables such as:
+
+- leads
+- customers
+- follow_ups
+- payments
+
+---
+
+## Invoice Database
+
+Tables such as:
+
+- invoices
+- invoice_items
+- customers
+- company_settings
+- invoice_payments
+
+---
+
+## Run Database Migration
 
 ```bash
 cd invoice_system
 python migrate.py
 ```
 
-For additional migration details, see [invoice_system/MIGRATION_GUIDE.md](/e:/all%20projects/sample_py/Intelligent-CRM-with-Invoice-Engine/invoice_system/MIGRATION_GUIDE.md).
+---
 
-## Running the Project
+# Running the Project
 
-### Run the invoice system
+## Run CRM Application
+
+```bash
+python crm/app.py
+```
+
+Default:
+
+```text
+http://127.0.0.1:5000
+```
+
+---
+
+## Run Invoice System
 
 ```bash
 python invoice_system/run.py
 ```
 
-Open:
+Default:
 
 ```text
 http://127.0.0.1:5001
 ```
 
-### Run the AI agent
+---
+
+## Run AI Assistant
 
 ```bash
 python ai_agent/main.py
@@ -214,36 +320,103 @@ Or:
 python ai_agent/run_agent.py
 ```
 
-### Run everything from the root launcher
+---
+
+## Run Complete System
 
 ```bash
 python run.py
 ```
 
-Note: this currently depends on `crm-flask/app.py`, which is missing from this repository snapshot.
+This launches the integrated CRM + Invoice + AI workflow system.
 
-## Example AI Queries
+---
 
-- `show today's leads`
-- `list pending payments`
-- `lead details for ABC company`
-- `status report`
-- `payment history for XYZ Pvt Ltd`
-- `documents required for gst registration`
+# Example AI Queries
 
-## Main Entry Points
+```text
+show today's leads
 
-- [run.py](/e:/all%20projects/sample_py/Intelligent-CRM-with-Invoice-Engine/run.py)
-- [invoice_system/run.py](/e:/all%20projects/sample_py/Intelligent-CRM-with-Invoice-Engine/invoice_system/run.py)
-- [ai_agent/main.py](/e:/all%20projects/sample_py/Intelligent-CRM-with-Invoice-Engine/ai_agent/main.py)
+list pending payments
 
-## Known Limitations
+lead details for ABC company
 
-- `crm-flask/` is empty in the current repo snapshot
-- root `requirements.txt` and `invoice_system/requirements.txt` overlap but are not unified
-- some AI agent database credentials are hard-coded for development
-- full setup instructions for database schema are only partially documented in the repo
+status report
 
-## License
+payment history for XYZ Pvt Ltd
 
-This project is licensed under the MIT License. See [LICENSE](/e:/all%20projects/sample_py/Intelligent-CRM-with-Invoice-Engine/LICENSE).
+documents required for gst registration
+```
+
+---
+
+# Main Entry Points
+
+| File | Purpose |
+|---|---|
+| run.py | Main integrated launcher |
+| crm/app.py | CRM application |
+| invoice_system/run.py | Invoice module |
+| ai_agent/main.py | AI assistant |
+
+---
+
+# Security Notes
+
+Before production deployment:
+
+- Remove hard-coded credentials
+- Use environment variables
+- Configure HTTPS
+- Secure database access
+- Add authentication & authorization
+- Store secrets securely
+
+---
+
+# Future Enhancements
+
+- Role-based authentication
+- Multi-user CRM
+- Email automation
+- WhatsApp integration
+- AI analytics dashboard
+- OCR invoice scanning
+- API integrations
+- Cloud deployment support
+- Docker support
+- Kubernetes deployment
+
+---
+
+# Deployment Options
+
+You can deploy the project using:
+
+- Render
+- Railway
+- VPS (Ubuntu)
+- AWS EC2
+- Azure
+- DigitalOcean
+
+---
+
+# License
+
+This project is licensed under the MIT License.
+
+See the LICENSE file for details.
+
+---
+
+# Author
+
+Ashwani Kumar
+
+- Machine Learning Engineer
+- Data Science & AI Developer
+- CRM and Business Automation Developer
+
+GitHub:
+https://github.com/12ashwani

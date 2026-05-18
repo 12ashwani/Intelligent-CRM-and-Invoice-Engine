@@ -42,9 +42,9 @@ class User(UserMixin):
 DEPARTMENT_HOME_ENDPOINTS = {
     "admin": "admin.admin_dashboard",
     "hr": "hr.dashboard",
-    "marketing": "employee.dashboard",
-    "operations": "employee.dashboard",
-    "accounts": "employee.dashboard",
+    "marketing": "marketing.dashboard",
+    "operations": "operations.dashboard",
+    "accounts": "accounts.payments",
     "employee": "employee.dashboard",
 }
 
@@ -106,6 +106,8 @@ def login():
                 )
             )
 
+            if normalized_role == "admin" or normalized_department == "admin":
+                return redirect(url_for("admin.admin_dashboard"))
             return redirect(url_for(DEPARTMENT_HOME_ENDPOINTS.get(normalized_department, "employee.attendance")))
 
         else:
@@ -191,6 +193,8 @@ def change_password():
         update_user_password(current_user.id, generate_password_hash(new_password))
 
         flash("Password changed successfully.", "success")
+        if getattr(current_user, "role", "") == "admin" or getattr(current_user, "department", "") == "admin":
+            return redirect(url_for("admin.admin_dashboard"))
         return redirect(url_for(DEPARTMENT_HOME_ENDPOINTS.get(current_user.department, "employee.attendance")))
 
     return render_template("change_password.html")

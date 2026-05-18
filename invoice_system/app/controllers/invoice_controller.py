@@ -210,6 +210,9 @@ def create_invoice_ui():
     cur, use_dict = get_cursor(DictCursor)
     cur.execute("SELECT * FROM customers")
     customers = cur.fetchall() if use_dict else fetchall_dict(cur)
+    if customers and not isinstance(customers[0], dict):
+        customer_columns = [col[0] for col in cur.description] if cur.description else []
+        customers = [dict(zip(customer_columns, row)) for row in customers]
     cur.execute(
         """
         SELECT
@@ -226,6 +229,10 @@ def create_invoice_ui():
         """
     )
     crm_leads = cur.fetchall() if use_dict else fetchall_dict(cur)
+    if crm_leads and not isinstance(crm_leads[0], dict):
+        lead_columns = [col[0] for col in cur.description] if cur.description else []
+        crm_leads = [dict(zip(lead_columns, row)) for row in crm_leads]
+    cur.close()
     selected_lead_id = request.args.get("lead_id", type=int)
     selected_lead = next((lead for lead in crm_leads if lead["id"] == selected_lead_id), None)
 
@@ -499,8 +506,13 @@ def download_invoice(invoice_id):
     try:
         file_path = generate_invoice_pdf(invoice, customer, items, company)
     except Exception as ex:
-        flash(f"Unable to generate invoice PDF: {ex}", "danger")
-        return redirect(url_for("invoice.invoice_ui"))
+        context = build_invoice_context(invoice, customer, items, company, pdf_mode=False)
+        template_name = select_invoice_template(context["invoice"]["invoice_type"])
+        flash(
+            f"PDF engine is unavailable ({ex}). Showing printable HTML invoice instead.",
+            "warning",
+        )
+        return render_template(template_name, **context)
 
     invoice_number = invoice["invoice_number"] if isinstance(invoice, dict) else invoice[1]
     return send_file(file_path, as_attachment=True, download_name=f"{invoice_number}.pdf")

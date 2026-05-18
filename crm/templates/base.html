@@ -287,7 +287,8 @@
 
     <ul class="nav flex-column gap-1">
       <li>
-        <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+        <a href="{{ url_for('employee.dashboard') }}" class="nav-link {% if request.path.startswith('/employee/dashboard') %}active{% endif %}">
+          <i class="bi bi-house-door-fill me-2"></i>Home
         </a>
       </li>
 
@@ -299,15 +300,39 @@
       </li>
       {% endif %}
 
-      {% if current_user.department == 'hr' %}
+      {% if current_user.department in ['admin', 'hr'] %}
       <li>
-        <a href="{{ url_for('hr.dashboard') }}" class="nav-link {% if request.path.startswith('/hr') %}active{% endif %}">
+        <a href="{{ url_for('hr.dashboard') }}" class="nav-link {% if request.path.startswith('/hr/dashboard') %}active{% endif %}">
           <i class="bi bi-people-fill me-2"></i>HR Panel
         </a>
       </li>
       <li>
         <a href="{{ url_for('hr.payroll') }}" class="nav-link {% if request.path.startswith('/hr/payroll') %}active{% endif %}">
           <i class="bi bi-cash-coin me-2"></i>Payroll
+        </a>
+      </li>
+      {% endif %}
+
+      {% if current_user.department in ['admin', 'marketing'] %}
+      <li>
+        <a href="{{ url_for('marketing.dashboard') }}" class="nav-link {% if request.path.startswith('/marketing/dashboard') or request.path.startswith('/marketing/leads') or request.path.startswith('/marketing/search') or request.path.startswith('/marketing/filter') %}active{% endif %}">
+          <i class="bi bi-megaphone-fill me-2"></i>Marketing
+        </a>
+      </li>
+      {% endif %}
+
+      {% if current_user.department in ['admin', 'operations'] %}
+      <li>
+        <a href="{{ url_for('operations.dashboard') }}" class="nav-link {% if request.path.startswith('/operations') %}active{% endif %}">
+          <i class="bi bi-gear-fill me-2"></i>Operations
+        </a>
+      </li>
+      {% endif %}
+
+      {% if current_user.department in ['admin', 'accounts'] %}
+      <li>
+        <a href="{{ url_for('accounts.payments') }}" class="nav-link {% if request.path.startswith('/accounts') %}active{% endif %}">
+          <i class="bi bi-calculator-fill me-2"></i>Accounts
         </a>
       </li>
       {% endif %}
