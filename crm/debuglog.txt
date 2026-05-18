@@ -1,0 +1,12 @@
+Request: POST /login
+Request: GET /employee/dashboard
+Request: GET /accounts/payments
+Request: POST /toggle-theme
+Request: GET /accounts/invoice-portal
+Request: GET /accounts/payments
+Request: POST /toggle-theme
+Request: GET /accounts/all-leads
+Request: POST /toggle-theme
+Request: GET /accounts/payments
+Request: POST /toggle-theme
+Request: GET /accounts/invoice-portal
